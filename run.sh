@@ -47,27 +47,23 @@ function listPkgs() {
 }
 
 function listFiles() {
-    echo $(find . -type f -name *.go)
+    echo $(find ./tests -type f -name *.go)
 }
 
 function output() {
-    if [ -z "$SILENT" ]; then
+    if [ -n "$SILENT" ]; then
         return 0
     fi
 
-    cat $TMP_FMP
-    
-    if [ -n "$TMP_FMP" ]; then
-        cat $TMP_FMP
+    if [ -n "$FAIL_FMT" ]; then
+        cat $TMP_FMT
     fi
 }
 
 if [ -n "$FMT" ]; then
-    TMP_FMP=$(mktemp)
-    PKGS=$(listFiles)
-    ! gofmt -d main.go > $TMP_FMP | cat $TMP_FMP 2>&1 | read || FAIL_FMP=1
+    TMP_FMT=$(mktemp)
+    gofmt -d $(listFiles) > $TMP_FMT
+    ! cat $TMP_FMT 2>&1 | read || FAIL_FMT=1
 fi
 
-#output
-echo $TMP_FMP
-ls -la $TMP_FMP
+output
